@@ -6,6 +6,8 @@ import AtaEditor from './components/AtaEditor';
 import AtaDetail from './components/AtaDetail';
 import { INITIAL_DATA } from './data/initialData';
 
+import { supabase } from './supabaseClient';
+
 export default function App() {
     const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [atas, setAtas] = useState([]);
@@ -23,77 +25,117 @@ export default function App() {
         { id: '03-Shift-Left', label: '03 - Estratégia Shift-Left' },
     ];
 
-    // Load initial data
+    // Load initial data from Supabase and subscribe to changes
     useEffect(() => {
-        // Check if we have data in localStorage
-        const savedData = localStorage.getItem('qa_vault_atas');
-        if (savedData) {
-            setAtas(JSON.parse(savedData));
-        } else {
-            setAtas(INITIAL_DATA);
-            localStorage.setItem('qa_vault_atas', JSON.stringify(INITIAL_DATA));
-        }
-
+        // Auth check (simple local check for now)
         const auth = localStorage.getItem('qa_vault_auth');
         if (auth === 'true') setIsAuthenticated(true);
+
+        fetchAtas();
+
+        // Realtime subscription
+        const subscription = supabase
+            .channel('public:atas')
+            .on('postgres_changes', { event: '*', schema: 'public', table: 'atas' }, (payload) => {
+                console.log('Realtime change received!', payload);
+                if (payload.eventType === 'INSERT') {
+                    setAtas(prev => [...prev, payload.new]);
+                } else if (payload.eventType === 'UPDATE') {
+                    setAtas(prev => prev.map(ata => ata.id === payload.new.id ? payload.new : ata));
+
+                    // Update selected view if open
+                    setSelectedAta(prev => prev && prev.id === payload.new.id ? payload.new : prev);
+                } else if (payload.eventType === 'DELETE') {
+                    setAtas(prev => prev.filter(ata => ata.id !== payload.old.id));
+                }
+            })
+            .subscribe();
+
+        return () => {
+            subscription.unsubscribe();
+        };
     }, []);
 
-    // Save changes to localStorage whenever atas change
-    useEffect(() => {
-        if (atas.length > 0) {
-            localStorage.setItem('qa_vault_atas', JSON.stringify(atas));
+    const fetchAtas = async () => {
+        const { data, error } = await supabase
+            .from('atas')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error fetching atas:', error);
+        } else if (data) {
+            setAtas(data);
         }
-    }, [atas]);
+    };
 
     const handleLogin = () => {
         setIsAuthenticated(true);
         localStorage.setItem('qa_vault_auth', 'true');
+        fetchAtas(); // Fetch on login
     };
 
     const handleLogout = () => {
         setIsAuthenticated(false);
         localStorage.removeItem('qa_vault_auth');
-        setView('list'); // Reset view on logout
+        setView('list');
     };
 
-    const handleSaveAta = (ataData) => {
+    const handleSaveAta = async (ataData) => {
+        const timestamp = new Date().toISOString();
+        let payload;
+
         if (selectedAta) {
             // Edit
-            const updatedAtas = atas.map(a => a.id === selectedAta.id ? { ...ataData, id: a.id, comments: a.comments } : a);
-            setAtas(updatedAtas);
+            payload = { ...ataData, id: selectedAta.id };
         } else {
             // Create
-            const newAta = {
+            // Note: ID generation can be done here or DB side. We'll use uuid or timestamp for now but DB primary key is text.
+            payload = {
                 ...ataData,
-                id: Date.now().toString(),
+                id: crypto.randomUUID(), // Ensure distinct IDs
+                created_at: timestamp,
                 comments: []
             };
-            setAtas([...atas, newAta]);
         }
-        setView('list');
-        setSelectedAta(null);
+
+        const { error } = await supabase
+            .from('atas')
+            .upsert(payload)
+            .select();
+
+        if (error) {
+            console.error('Error saving ata:', error);
+            alert('Erro ao salvar no Supabase!');
+        } else {
+            // Optimistic update handled by realtime subscription usually, 
+            // but for instant feedback we might want to wait or just rely on subscription. 
+            // We'll rely on subscription to update the list, but we need to close the editor.
+            setView('list');
+            setSelectedAta(null);
+        }
     };
 
-    const handleAddComment = (ataId, text) => {
-        const updatedAtas = atas.map(a => {
-            if (a.id === ataId) {
-                return {
-                    ...a,
-                    comments: [...a.comments, {
-                        author: 'QA Member',
-                        text,
-                        date: new Date().toLocaleString()
-                    }]
-                };
-            }
-            return a;
-        });
-        setAtas(updatedAtas);
+    const handleAddComment = async (ataId, text) => {
+        const ata = atas.find(a => a.id === ataId);
+        if (!ata) return;
 
-        // Update selected ata view immediately
-        if (selectedAta && selectedAta.id === ataId) {
-            const updated = updatedAtas.find(a => a.id === ataId);
-            setSelectedAta(updated);
+        const newComment = {
+            author: 'QA Member', // Hardcoded for now until Auth is fully integrated
+            text,
+            date: new Date().toLocaleString()
+        };
+
+        const updatedComments = [...(ata.comments || []), newComment];
+
+        const { error } = await supabase
+            .from('atas')
+            .update({ comments: updatedComments })
+            .eq('id', ataId);
+
+        if (error) {
+            console.error('Error adding comment:', error);
+            alert('Erro ao adicionar comentário');
         }
     };
 
@@ -102,7 +144,7 @@ export default function App() {
         if (!file) return;
 
         const reader = new FileReader();
-        reader.onload = (e) => {
+        reader.onload = async (e) => {
             try {
                 const importedData = JSON.parse(e.target.result);
                 if (!Array.isArray(importedData)) {
@@ -110,32 +152,26 @@ export default function App() {
                     return;
                 }
 
-                // Merge strategy: Update existing by ID, append new ones
-                const currentIds = new Set(atas.map(a => a.id));
-                const mergedAtas = [...atas];
+                // Filter valid records
+                const validAtas = importedData.filter(item => item.id && item.title && item.content);
 
-                let newCount = 0;
-                let updatedCount = 0;
+                if (validAtas.length === 0) {
+                    alert('Nenhuma ata válida encontrada no arquivo.');
+                    return;
+                }
 
-                importedData.forEach(importedAta => {
-                    if (!importedAta.id || !importedAta.title || !importedAta.content) return; // Skip invalid records
+                // Batch upsert to Supabase
+                const { error } = await supabase
+                    .from('atas')
+                    .upsert(validAtas);
 
-                    if (currentIds.has(importedAta.id)) {
-                        // Update existing
-                        const index = mergedAtas.findIndex(a => a.id === importedAta.id);
-                        mergedAtas[index] = { ...mergedAtas[index], ...importedAta };
-                        updatedCount++;
-                    } else {
-                        // Add new
-                        mergedAtas.push(importedAta);
-                        currentIds.add(importedAta.id);
-                        newCount++;
-                    }
-                });
-
-                setAtas(mergedAtas);
-                alert(`Importação concluída!\n${newCount} novas atas adicionadas.\n${updatedCount} atas atualizadas.`);
-                setView('list');
+                if (error) {
+                    console.error('Error importing data:', error);
+                    alert('Erro ao importar dados para o Supabase.');
+                } else {
+                    alert(`Importação iniciada! ${validAtas.length} registros processados.`);
+                    setView('list');
+                }
             } catch (error) {
                 console.error('Erro ao importar:', error);
                 alert('Erro ao ler o arquivo JSON. Verifique o formato.');
