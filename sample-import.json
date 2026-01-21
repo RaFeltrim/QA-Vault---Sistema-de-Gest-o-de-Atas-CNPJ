@@ -1,0 +1,10 @@
+[
+    {
+        "id": "ata-import-test",
+        "title": "Ata Importada - Teste de Backup",
+        "date": "2026-02-01",
+        "category": "02-Milestones",
+        "content": "# Teste de Importação\n\nEsta ata foi importada via arquivo JSON para validar a funcionalidade.\n\n## Itens\n* Item A\n* Item B",
+        "comments": []
+    }
+]
