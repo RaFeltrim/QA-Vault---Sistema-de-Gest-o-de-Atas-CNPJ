@@ -146,6 +146,17 @@ export default function App() {
         event.target.value = '';
     };
 
+    const stripMarkdown = (text) => {
+        if (!text) return '';
+        return text
+            .replace(/#/g, '') // Headers
+            .replace(/\*\*/g, '') // Bold
+            .replace(/\*/g, '') // Bullets
+            .replace(/\[([^\]]+)\]\([^)]+\)/g, '$1') // Links
+            .replace(/`/g, '') // Code
+            .trim();
+    };
+
     if (!isAuthenticated) {
         return <LoginScreen onLogin={handleLogin} />;
     }
@@ -191,12 +202,6 @@ export default function App() {
                             />
                             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                         </div>
-                        <button
-                            onClick={() => { setSelectedAta(null); setView('create'); }}
-                            className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center text-sm font-bold shadow-md transition-transform hover:scale-105"
-                        >
-                            <Plus className="w-4 h-4 mr-2" /> Nova Ata
-                        </button>
                         <button
                             onClick={() => fileInputRef.current.click()}
                             className="text-slate-500 hover:text-indigo-600 px-3 py-2 rounded-lg flex items-center text-sm font-medium transition-colors"
@@ -251,7 +256,7 @@ export default function App() {
                                         </div>
                                         <h3 className="text-lg font-bold text-slate-800 mb-2 group-hover:text-indigo-700">{ata.title}</h3>
                                         <p className="text-sm text-slate-500 mb-4 line-clamp-2">
-                                            {ata.content.replace(/#/g, '').substring(0, 150)}...
+                                            {stripMarkdown(ata.content).substring(0, 150)}...
                                         </p>
                                         <div className="flex justify-between items-center text-xs text-slate-400 border-t border-slate-100 pt-3">
                                             <span className="flex items-center"><Calendar className="w-3 h-3 mr-1" /> {ata.date}</span>
