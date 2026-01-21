@@ -4,12 +4,13 @@ O **QA Vault** é uma aplicação moderna para gestão de atas de reunião, foca
 
 ## 🚀 Funcionalidades
 
-- **Gestão de Atas**: CRUD completo (Criar, Ler, Editar, Excluir*) de atas.
+- **Gestão de Atas**: CRUD completo (**Criar**, **Ler**, **Editar**, **Excluir**) de atas.
+- **Autenticação de Usuário**: Seleção de perfil (Rafael / Mauricio) para atribuição correta de autoria em comentários.
+- **Seleção de Projeto**: Alternância entre projetos (ex: CNPJ-Alfanumérico).
+- **Upload Multi-formato**: Importação de atas via arquivos `.json`, `.txt`, `.md` e `.pdf`.
 - **Editor Rico**: Editor Markdown com preview em tempo real e toolbar de formatação.
 - **Colaboração Real-Time**: Sincronização automática de dados entre usuários (via Supabase).
 - **Categorização**: Organização em Kickoffs, Kanban, Milestones e Shift-Left.
-- **Busca**: Filtragem rápida por título e conteúdo.
-- **Importação**: Suporte a importação de atas em lote via arquivo JSON.
 - **Interface Moderna**: UI polida e responsiva com Tailwind CSS.
 
 ## 🛠️ Tech Stack
@@ -18,6 +19,7 @@ O **QA Vault** é uma aplicação moderna para gestão de atas de reunião, foca
 - **Estilização**: Tailwind CSS, PostCSS
 - **Ícones**: Lucide React
 - **Backend/Banco de Dados**: Supabase (PostgreSQL + Realtime)
+- **PDF Processing**: pdfjs-dist
 - **Markdown**: React Markdown, Remark GFM, Tailwind Typography
 
 ## 📦 Estrutura do Projeto
@@ -25,14 +27,14 @@ O **QA Vault** é uma aplicação moderna para gestão de atas de reunião, foca
 ```
 src/
 ├── components/       # Componentes React reutilizáveis
-│   ├── AtaDetail.jsx     # Visualização detalhada da ata
+│   ├── AtaDetail.jsx     # Visualização detalhada e Exclusão
 │   ├── AtaEditor.jsx     # Formulário de edição/criação
 │   ├── MarkdownEditor.jsx# Editor com preview e toolbar
-│   ├── Sidebar.jsx       # Navegação lateral
-│   └── LoginScreen.jsx   # Tela de login simples
+│   ├── Sidebar.jsx       # Navegação lateral e Seletor de Projeto
+│   └── LoginScreen.jsx   # Tela de login com Seleção de Usuário
 ├── data/             # Dados estáticos/iniciais
 ├── supabaseClient.js # Configuração do cliente Supabase
-├── App.jsx           # Componente principal e lógica de estado
+├── App.jsx           # Lógica principal (Upload, Auth, Routing)
 └── main.jsx          # Ponto de entrada
 ```
 

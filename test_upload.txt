@@ -1,0 +1,3 @@
+Esta é uma ata de teste importada de um arquivo de texto.
+Conteúdo simples para verificação.
+Data: 21/01/2026

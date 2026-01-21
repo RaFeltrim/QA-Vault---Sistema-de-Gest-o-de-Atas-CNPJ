@@ -3,12 +3,13 @@ import { Book } from 'lucide-react';
 
 const LoginScreen = ({ onLogin }) => {
     const [password, setPassword] = useState('');
+    const [selectedUser, setSelectedUser] = useState('Rafael');
     const [error, setError] = useState('');
 
     const handleSubmit = (e) => {
         e.preventDefault();
         if (password === (import.meta.env.VITE_APP_ACCESS_PASSWORD || 'OLAMUNDOQACNPJ098')) {
-            onLogin();
+            onLogin(selectedUser);
         } else {
             setError('Senha de acesso incorreta.');
         }
@@ -24,6 +25,30 @@ const LoginScreen = ({ onLogin }) => {
                 </div>
                 <h1 className="text-2xl font-bold text-center text-slate-800 mb-2">QA Vault Access</h1>
                 <p className="text-center text-slate-500 mb-6">Repositório Oficial - Projeto CNPJ</p>
+
+                <div className="mb-6">
+                    <p className="block text-sm font-medium text-slate-700 mb-2 text-center">Selecionar Usuário</p>
+                    <div className="flex justify-center space-x-4">
+                        <button
+                            onClick={() => setSelectedUser('Rafael')}
+                            className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedUser === 'Rafael'
+                                ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-bold'
+                                : 'border-slate-200 text-slate-500 hover:border-indigo-300'
+                                }`}
+                        >
+                            Rafael
+                        </button>
+                        <button
+                            onClick={() => setSelectedUser('Mauricio')}
+                            className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedUser === 'Mauricio'
+                                ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-bold'
+                                : 'border-slate-200 text-slate-500 hover:border-indigo-300'
+                                }`}
+                        >
+                            Mauricio
+                        </button>
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit} className="space-y-4">
                     <div>
@@ -41,7 +66,7 @@ const LoginScreen = ({ onLogin }) => {
                         type="submit"
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors"
                     >
-                        Entrar no Vault
+                        Entrar como {selectedUser}
                     </button>
                 </form>
             </div>

@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Calendar, FolderOpen, Edit3, MessageSquare } from 'lucide-react';
+import { Calendar, FolderOpen, Edit3, MessageSquare, Trash2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import remarkGfm from 'remark-gfm';
 
-const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
+const AtaDetail = ({ ata, onEdit, onBack, onAddComment, onDelete, onEditComment, onDeleteComment, currentUser }) => {
     const [newComment, setNewComment] = useState('');
+    const [editingCommentIndex, setEditingCommentIndex] = useState(null);
+    const [editingCommentText, setEditingCommentText] = useState('');
 
     const handleCommentSubmit = (e) => {
         e.preventDefault();
@@ -13,7 +15,15 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
         setNewComment('');
     };
 
+    const startEditing = (idx, text) => {
+        setEditingCommentIndex(idx);
+        setEditingCommentText(text);
+    };
 
+    const saveEdit = (idx) => {
+        onEditComment(ata.id, idx, editingCommentText);
+        setEditingCommentIndex(null);
+    };
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
@@ -28,12 +38,21 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
                         <span className="flex items-center"><FolderOpen className="w-4 h-4 mr-1" /> {ata.category}</span>
                     </div>
                 </div>
-                <button
-                    onClick={() => onEdit(ata)}
-                    className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-200 transition-colors flex items-center font-medium"
-                >
-                    <Edit3 className="w-4 h-4 mr-2" /> Editar
-                </button>
+                <div className="flex space-x-2">
+                    <button
+                        onClick={() => onEdit(ata)}
+                        className="bg-indigo-100 text-indigo-700 px-4 py-2 rounded-lg hover:bg-indigo-200 transition-colors flex items-center font-medium"
+                    >
+                        <Edit3 className="w-4 h-4 mr-2" /> Editar
+                    </button>
+                    <button
+                        onClick={() => onDelete(ata.id)}
+                        className="bg-red-100 text-red-700 px-4 py-2 rounded-lg hover:bg-red-200 transition-colors flex items-center font-medium"
+                        title="Excluir Ata"
+                    >
+                        <Trash2 className="w-4 h-4 mr-2" /> Excluir
+                    </button>
+                </div>
             </div>
 
             <div className="p-8">
@@ -58,9 +77,59 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
                             <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="font-bold text-sm text-indigo-900">{comment.author}</span>
-                                    <span className="text-xs text-slate-400">{comment.date}</span>
+                                    <div className="flex items-center space-x-2">
+                                        <span className="text-xs text-slate-400">{comment.date}</span>
+                                        {currentUser === comment.author && (
+                                            <div className="flex space-x-1 ml-2">
+                                                {editingCommentIndex === idx ? (
+                                                    // Edit Mode Controls
+                                                    null // Handled below
+                                                ) : (
+                                                    <>
+                                                        <button
+                                                            onClick={() => startEditing(idx, comment.text)}
+                                                            className="text-slate-400 hover:text-indigo-600 p-1"
+                                                            title="Editar"
+                                                        >
+                                                            <Edit3 className="w-3 h-3" />
+                                                        </button>
+                                                        <button
+                                                            onClick={() => onDeleteComment(ata.id, idx)}
+                                                            className="text-slate-400 hover:text-red-600 p-1"
+                                                            title="Excluir"
+                                                        >
+                                                            <Trash2 className="w-3 h-3" />
+                                                        </button>
+                                                    </>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
-                                <p className="text-slate-700 text-sm">{comment.text}</p>
+                                {editingCommentIndex === idx ? (
+                                    <div className="flex gap-2 mt-2">
+                                        <input
+                                            type="text"
+                                            className="flex-1 px-2 py-1 border border-slate-300 rounded text-sm focus:ring-1 focus:ring-indigo-500 outline-none"
+                                            value={editingCommentText}
+                                            onChange={(e) => setEditingCommentText(e.target.value)}
+                                        />
+                                        <button
+                                            onClick={() => saveEdit(idx)}
+                                            className="bg-green-600 text-white px-2 py-1 rounded text-xs hover:bg-green-700"
+                                        >
+                                            Salvar
+                                        </button>
+                                        <button
+                                            onClick={() => setEditingCommentIndex(null)}
+                                            className="bg-slate-300 text-slate-700 px-2 py-1 rounded text-xs hover:bg-slate-400"
+                                        >
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                ) : (
+                                    <p className="text-slate-700 text-sm whitespace-pre-wrap">{comment.text}</p>
+                                )}
                             </div>
                         ))
                     )}

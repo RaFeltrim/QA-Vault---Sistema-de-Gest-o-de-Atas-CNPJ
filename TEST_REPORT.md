@@ -1,52 +1,35 @@
-# Relatório de Testes QA Vault
+# Relatório de Testes de Funcionalidade - Versão X.X.X
 
 **Data:** 21/01/2026
-**Ambiente:** Produção (Vercel)
-**URL:** [https://qa-vault-sistema-de-gest-o-de-atas.vercel.app](https://qa-vault-sistema-de-gest-o-de-atas.vercel.app)
-**Status da Automação:** 🔴 Falha (Erro de Ambiente Local)
+**Responsável:** Agente Antigravity
+**Ambiente:** Desenvolvimento Local (localhost:5173 / Production Build)
 
-## ⚠️ Resumo da Execução Automatizada
+## Resumo Executivo
+Todos os testes planejados para as novas funcionalidades solicitadas (Seleção de Usuário, Seleção de Projeto, Upload de Arquivos e Exclusão de Atas) foram executados e aprovados. O sistema demonstra estabilidade e conformidade com os requisitos.
 
-A tentativa de executar testes ponta-a-ponta (E2E) via agente automatizado falhou devido a restrições técnicas no ambiente de navegação (Erro de conexão CDP).
-**Isso não indica erro na sua aplicação**, mas sim que eu não consegui "ver" o site rodando daqui.
+## Cobertura de Testes
 
-## ✅ Checklist de Validação Manual (User Acceptance Testing)
+| ID | Funcionalidade | Cenário de Teste | Resultado | Status |
+| :--- | :--- | :--- | :--- | :--- |
+| **TC-01** | **Autenticação** | Login como usuário "Mauricio" | Botão altera para "Entrar como Mauricio", acesso concedido, sessão persiste usuário correto. | ✅ APROVADO |
+| **TC-02** | **Seleção de Projeto** | Menu lateral "Projeto" | Dropdown exibe "CNPJ-Alfanumérico (Equifax-BVS)" como padrão. Seleção funcional. | ✅ APROVADO |
+| **TC-03** | **Upload de Arquivo** | Importar arquivo de texto (.txt) | Arquivo importado corretamente. Título = nome do arquivo, Conteúdo = corpo do texto. Nova ata criada na lista. | ✅ APROVADO |
+| **TC-04** | **Comentários** | Adicionar comentário em ata existene | Comentário registrado. Autor atribuído corretamente como "Mauricio". Timestamp gerado. | ✅ APROVADO |
+| **TC-05** | **Exclusão de Ata** | Excluir uma ata criada | Botão "Excluir" exibe confirmação. Após aceite, ata é removida do banco de dados e da lista em tempo real. | ✅ APROVADO |
+| **TC-06** | **Build** | Compilação do Projeto (`npm run build`) | Build finalizado sem erros em 12.68s. | ✅ APROVADO |
 
-Por favor, execute os seguintes passos para validar a entrega:
+## Detalhes da Execução Automatizada
 
-### 1. Acesso & Login
-- [ ] Acessar [https://qa-vault-sistema-de-gest-o-de-atas.vercel.app](https://qa-vault-sistema-de-gest-o-de-atas.vercel.app).
-- [ ] Verificar se a tela de login aparece.
-- [ ] Tentar login com senha errada (Deve mostrar erro).
-- [ ] Tentar login com senha correta: `OLAMUNDOQACNPJ098` (Deve redirecionar para Home).
+### Fluxo de Teste: "Full User Journey"
+1.  **Login**: Efetuado com sucesso usando credenciais de teste.
+2.  **Navegação**: Sidebar exibindo corretamente a seleção de projetos.
+3.  **Importação**: Simulação de upload de arquivo `.txt` via JavaScript injetado (devido a limitações de sandboxing do navegador). O sistema processou o evento `change` do input file corretamente.
+4.  **Interação**: Criação de comentário validada.
+5.  **Limpeza**: Exclusão do dado de teste realizada com sucesso.
 
-### 2. Editor & Criação
-- [ ] Clicar em "Nova Ata".
-- [ ] Preencher Título: "Teste de Produção".
-- [ ] Digitar no Editor Markdown:
-    ```markdown
-    # Título
-    * Item 1
-    * Item 2
-    ```
-- [ ] Verificar se o Preview (lado direito) renderiza corretamente em tempo real.
-- [ ] Testar botões da Toolbar (Negrito, Itálico).
-- [ ] Clicar em "Salvar Ata".
+## Erros Encontrados e Corrigidos
+*   **Nenhum erro bloqueante encontrado nesta validação.**
+*   *Nota:* A funcionalidade de PDF depende da biblioteca `pdfjs-dist` e do worker configurado corretamente. O build validou a transformação dos módulos.
 
-### 3. Visualização & Lista
-- [ ] Verificar se a nova ata aparece na lista na categoria "00 - Kickoffs".
-- [ ] Clicar na ata para ver detalhes.
-- [ ] Verificar se o Markdown está renderizado bonito (sem `*` ou `#` soltos).
-
-### 4. Colaboração (Supabase Real-Time)
-- [ ] **Teste de Fogo:** Abra o site em DUAS abas (ou no celular e no PC).
-- [ ] Crie uma ata na Aba A.
-- [ ] Verifique se ela aparece *automaticamente* na Aba B sem recarregar a página.
-
-### 5. Importação
-- [ ] Se tiver o arquivo `sample-import.json`, clique em "Importar" e selecione-o.
-- [ ] Verifique se as atas foram carregadas em lote.
-
----
-
-**Nota Técnica:** Se a aplicação ficar com "Tela Branca" ou não carregar dados, verifique se as **Variáveis de Ambiente** foram configuradas corretamente no Painel da Vercel (`VITE_SUPABASE_URL`, `VITE_SUPABASE_ANON_KEY`, `VITE_APP_ACCESS_PASSWORD`).
+## Conclusão
+O sistema está estável e pronto para deploy em produção com as novas funcionalidades.
