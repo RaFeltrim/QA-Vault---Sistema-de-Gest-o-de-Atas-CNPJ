@@ -7,7 +7,7 @@ const LoginScreen = ({ onLogin }) => {
 
     const handleSubmit = (e) => {
         e.preventDefault();
-        if (password === 'OLAMUNDOQACNPJ098') {
+        if (password === (import.meta.env.VITE_APP_ACCESS_PASSWORD || 'OLAMUNDOQACNPJ098')) {
             onLogin();
         } else {
             setError('Senha de acesso incorreta.');
