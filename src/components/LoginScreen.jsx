@@ -30,6 +30,7 @@ const LoginScreen = ({ onLogin }) => {
                     <p className="block text-sm font-medium text-slate-700 mb-2 text-center">Selecionar Usuário</p>
                     <div className="flex justify-center space-x-4">
                         <button
+                            data-testid="login-user-select-Rafael"
                             onClick={() => setSelectedUser('Rafael')}
                             className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedUser === 'Rafael'
                                 ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-bold'
@@ -39,6 +40,7 @@ const LoginScreen = ({ onLogin }) => {
                             Rafael
                         </button>
                         <button
+                            data-testid="login-user-select-Mauricio"
                             onClick={() => setSelectedUser('Mauricio')}
                             className={`px-4 py-2 rounded-lg border-2 transition-all ${selectedUser === 'Mauricio'
                                 ? 'border-indigo-600 bg-indigo-50 text-indigo-700 font-bold'
@@ -54,6 +56,7 @@ const LoginScreen = ({ onLogin }) => {
                     <div>
                         <label className="block text-sm font-medium text-slate-700 mb-1">Senha de Acesso</label>
                         <input
+                            data-testid="login-password-input"
                             type="password"
                             className="w-full px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 focus:outline-none"
                             value={password}
@@ -63,6 +66,7 @@ const LoginScreen = ({ onLogin }) => {
                     </div>
                     {error && <p className="text-red-500 text-sm text-center">{error}</p>}
                     <button
+                        data-testid="login-submit-button"
                         type="submit"
                         className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded transition-colors"
                     >

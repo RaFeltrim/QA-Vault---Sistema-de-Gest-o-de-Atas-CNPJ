@@ -22,6 +22,7 @@ const AtaEditor = ({ ata, onSave, onCancel }) => {
                 <div>
                     <label className="block text-sm font-medium text-slate-700 mb-1">Título</label>
                     <input
+                        data-testid="editor-title-input"
                         type="text"
                         className="w-full px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 outline-none"
                         value={formData.title}
@@ -54,7 +55,7 @@ const AtaEditor = ({ ata, onSave, onCancel }) => {
 
             <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Conteúdo (Markdown Suportado)</label>
-                <div className="h-[500px]">
+                <div data-testid="editor-content-textarea" className="h-[500px]">
                     <MarkdownEditor
                         value={formData.content}
                         onChange={(newContent) => setFormData({ ...formData, content: newContent })}
@@ -64,12 +65,14 @@ const AtaEditor = ({ ata, onSave, onCancel }) => {
 
             <div className="flex justify-end space-x-3">
                 <button
+                    data-testid="editor-cancel-btn"
                     onClick={onCancel}
                     className="px-4 py-2 text-slate-600 hover:bg-slate-100 rounded font-medium"
                 >
                     Cancelar
                 </button>
                 <button
+                    data-testid="editor-save-btn"
                     onClick={() => onSave(formData)}
                     className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded font-medium flex items-center"
                 >

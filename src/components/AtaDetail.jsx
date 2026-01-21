@@ -32,7 +32,7 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment, onDelete, onEditComment,
                     <button onClick={onBack} className="text-sm text-indigo-600 hover:underline mb-2 flex items-center">
                         &larr; Voltar para lista
                     </button>
-                    <h1 className="text-3xl font-bold text-slate-900">{ata.title}</h1>
+                    <h1 data-testid="ata-detail-title" className="text-3xl font-bold text-slate-900">{ata.title}</h1>
                     <div className="flex items-center mt-2 text-slate-500 text-sm space-x-4">
                         <span className="flex items-center"><Calendar className="w-4 h-4 mr-1" /> {ata.date}</span>
                         <span className="flex items-center"><FolderOpen className="w-4 h-4 mr-1" /> {ata.category}</span>
@@ -74,7 +74,7 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment, onDelete, onEditComment,
                         <p className="text-slate-400 italic text-sm">Nenhum comentário ainda. Adicione uma observação.</p>
                     ) : (
                         ata.comments.map((comment, idx) => (
-                            <div key={idx} className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
+                            <div key={idx} data-testid={`comment-item-${idx}`} className="bg-white p-4 rounded-lg shadow-sm border border-slate-200">
                                 <div className="flex justify-between items-center mb-1">
                                     <span className="font-bold text-sm text-indigo-900">{comment.author}</span>
                                     <div className="flex items-center space-x-2">
@@ -137,6 +137,7 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment, onDelete, onEditComment,
 
                 <form onSubmit={handleCommentSubmit} className="flex gap-2">
                     <input
+                        data-testid="comment-input"
                         type="text"
                         className="flex-1 px-4 py-2 border border-slate-300 rounded-md focus:ring-2 focus:ring-indigo-500 outline-none text-sm"
                         placeholder="Adicionar um comentário ou observação..."
@@ -144,6 +145,7 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment, onDelete, onEditComment,
                         onChange={(e) => setNewComment(e.target.value)}
                     />
                     <button
+                        data-testid="comment-submit-btn"
                         type="submit"
                         className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-md font-medium text-sm transition-colors"
                     >

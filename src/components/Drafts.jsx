@@ -34,6 +34,7 @@ const Drafts = ({ activeProject }) => {
                 </span>
             </div>
             <textarea
+                data-testid="drafts-textarea"
                 className="flex-1 w-full p-6 text-slate-700 leading-relaxed focus:outline-none resize-none font-mono text-sm"
                 placeholder="Digite suas anotações rápidas aqui... (Persiste mesmo após fechar o navegador)"
                 value={content}

@@ -507,7 +507,7 @@ export default function App() {
                         <button className="md:hidden mr-3 text-slate-600" onClick={() => setIsMobileOpen(true)}>
                             <Menu />
                         </button>
-                        <h2 className="text-xl font-bold text-indigo-900">
+                        <h2 data-testid="header-title" className="text-xl font-bold text-indigo-900">
                             {categories.find(c => c.id === activeCategory)?.name || (activeCategory === 'drafts' ? 'Rascunho' : activeCategory === 'whiteboard' ? 'Whiteboard' : 'QA Vault')}
                         </h2>
                     </div>
@@ -515,6 +515,7 @@ export default function App() {
                     <div className="flex items-center space-x-4">
                         <div className="relative hidden md:block">
                             <input
+                                data-testid="search-input"
                                 type="text"
                                 placeholder="Buscar em atas..."
                                 className="pl-10 pr-4 py-2 border border-slate-300 rounded-full text-sm focus:ring-2 focus:ring-indigo-500 outline-none w-64 transition-all focus:w-80"
@@ -524,6 +525,7 @@ export default function App() {
                             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
                         </div>
                         <button
+                            data-testid="import-file-btn"
                             onClick={() => fileInputRef.current.click()}
                             className="text-slate-500 hover:text-indigo-600 px-3 py-2 rounded-lg flex items-center text-sm font-medium transition-colors"
                             title="Importar Arquivo"
@@ -539,6 +541,7 @@ export default function App() {
                             className="hidden"
                         />
                         <button
+                            data-testid="new-ata-btn"
                             onClick={() => { setSelectedAta(null); setView('create'); }}
                             className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg flex items-center text-sm font-bold shadow-md transition-transform hover:scale-105"
                         >
@@ -570,6 +573,7 @@ export default function App() {
                                 filteredAtas.map(ata => (
                                     <div
                                         key={ata.id}
+                                        data-testid={`ata-list-item-${ata.id}`}
                                         onClick={() => { setSelectedAta(ata); setView('detail'); }}
                                         className="bg-white rounded-lg shadow-sm hover:shadow-md border border-slate-200 p-6 cursor-pointer transition-all hover:border-indigo-300 group"
                                     >

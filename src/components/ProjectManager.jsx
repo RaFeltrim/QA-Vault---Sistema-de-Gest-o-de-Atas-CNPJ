@@ -12,7 +12,7 @@ const ProjectManager = ({ projects, onClose, onAdd, onDelete }) => {
     };
 
     return (
-        <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+        <div data-testid="project-modal" className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
             <div className="bg-white rounded-xl shadow-2xl w-full max-w-md overflow-hidden animate-fade-in">
                 <div className="bg-slate-800 p-4 flex justify-between items-center text-white">
                     <h2 className="text-lg font-bold flex items-center">
@@ -28,10 +28,11 @@ const ProjectManager = ({ projects, onClose, onAdd, onDelete }) => {
                         <h3 className="text-sm font-semibold text-slate-500 uppercase tracking-wider mb-3">Projetos Existentes</h3>
                         <div className="space-y-2 max-h-60 overflow-y-auto">
                             {projects.map((project, idx) => (
-                                <div key={project.id || idx} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
+                                <div key={project.id || idx} data-testid={`project-item-${project.id}`} className="flex justify-between items-center p-3 bg-slate-50 rounded-lg border border-slate-200">
                                     <span className="text-slate-800 font-medium">{project.name}</span>
                                     {/* Prevent deleting the default hardcoded project if we want, but for now allow all except maybe active one? */}
                                     <button
+                                        data-testid={`project-delete-btn-${project.id}`}
                                         onClick={() => onDelete(project.id)}
                                         className="text-slate-400 hover:text-red-500 p-1"
                                         title="Excluir Projeto"
@@ -50,6 +51,7 @@ const ProjectManager = ({ projects, onClose, onAdd, onDelete }) => {
                         <label className="block text-sm font-medium text-slate-700 mb-2">Novo Projeto</label>
                         <div className="flex gap-2">
                             <input
+                                data-testid="project-input"
                                 type="text"
                                 className="flex-1 px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
                                 placeholder="Nome do projeto..."
@@ -57,6 +59,7 @@ const ProjectManager = ({ projects, onClose, onAdd, onDelete }) => {
                                 onChange={(e) => setNewProjectName(e.target.value)}
                             />
                             <button
+                                data-testid="project-add-btn"
                                 type="submit"
                                 className="bg-indigo-600 hover:bg-indigo-700 text-white px-4 py-2 rounded-lg font-bold transition-colors"
                             >

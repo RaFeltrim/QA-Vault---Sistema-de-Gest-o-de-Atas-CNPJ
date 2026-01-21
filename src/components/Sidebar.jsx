@@ -24,12 +24,13 @@ const Sidebar = ({ activeCategory, setActiveCategory, categories, onLogout, isMo
             <div className="px-4 py-4 border-b border-slate-700 bg-slate-800/50">
                 <div className="flex items-center justify-between mb-2">
                     <label className="text-xs font-semibold uppercase tracking-wider text-slate-500">Projeto Ativo</label>
-                    <button onClick={onManageProjects} className="text-slate-500 hover:text-indigo-400 transition-colors" title="Gerenciar Projetos">
+                    <button onClick={onManageProjects} data-testid="sidebar-manage-projects-btn" className="text-slate-500 hover:text-indigo-400 transition-colors" title="Gerenciar Projetos">
                         <Settings className="w-3.5 h-3.5" />
                     </button>
                 </div>
                 <div className="relative">
                     <select
+                        data-testid="sidebar-project-select"
                         value={projects.find(p => p.name === activeProject)?.id || ''}
                         onChange={(e) => {
                             const project = projects.find(p => p.id === e.target.value);
@@ -56,13 +57,14 @@ const Sidebar = ({ activeCategory, setActiveCategory, categories, onLogout, isMo
                     <div className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
                         Categorias
                     </div>
-                    <button onClick={onManageCategories} className="text-slate-600 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all" title="Editar Categorias">
+                    <button onClick={onManageCategories} data-testid="sidebar-manage-categories-btn" className="text-slate-600 hover:text-indigo-400 opacity-0 group-hover:opacity-100 transition-all" title="Editar Categorias">
                         <Settings className="w-3 h-3" />
                     </button>
                 </div>
                 {categories.map((cat) => (
                     <button
                         key={cat.id}
+                        data-testid={`sidebar-nav-${cat.id}`}
                         onClick={() => {
                             setActiveCategory(cat.id);
                             setIsMobileOpen(false);
@@ -78,6 +80,7 @@ const Sidebar = ({ activeCategory, setActiveCategory, categories, onLogout, isMo
                     Ferramentas
                 </div>
                 <button
+                    data-testid="sidebar-nav-drafts"
                     onClick={() => {
                         setActiveCategory('drafts');
                         setIsMobileOpen(false);
@@ -89,6 +92,7 @@ const Sidebar = ({ activeCategory, setActiveCategory, categories, onLogout, isMo
                     <span className="text-sm font-medium">Rascunho</span>
                 </button>
                 <button
+                    data-testid="sidebar-nav-whiteboard"
                     onClick={() => {
                         setActiveCategory('whiteboard');
                         setIsMobileOpen(false);
@@ -103,6 +107,7 @@ const Sidebar = ({ activeCategory, setActiveCategory, categories, onLogout, isMo
 
             <div className="p-4 border-t border-slate-700">
                 <button
+                    data-testid="sidebar-logout-btn"
                     onClick={onLogout}
                     className="flex items-center w-full px-4 py-2 text-sm text-red-400 hover:bg-slate-700 rounded transition-colors"
                 >
