@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Edit3, Save } from 'lucide-react';
+import MarkdownEditor from './MarkdownEditor';
 
 const AtaEditor = ({ ata, onSave, onCancel }) => {
     const [formData, setFormData] = useState(ata || {
@@ -53,12 +54,12 @@ const AtaEditor = ({ ata, onSave, onCancel }) => {
 
             <div className="mb-6">
                 <label className="block text-sm font-medium text-slate-700 mb-1">Conteúdo (Markdown Suportado)</label>
-                <textarea
-                    className="w-full h-96 px-3 py-2 border border-slate-300 rounded focus:ring-2 focus:ring-indigo-500 outline-none font-mono text-sm"
-                    value={formData.content}
-                    onChange={(e) => setFormData({ ...formData, content: e.target.value })}
-                />
-                <p className="text-xs text-slate-500 mt-1">Dica: Use # para títulos, * para bullets e ** para negrito.</p>
+                <div className="h-[500px]">
+                    <MarkdownEditor
+                        value={formData.content}
+                        onChange={(newContent) => setFormData({ ...formData, content: newContent })}
+                    />
+                </div>
             </div>
 
             <div className="flex justify-end space-x-3">

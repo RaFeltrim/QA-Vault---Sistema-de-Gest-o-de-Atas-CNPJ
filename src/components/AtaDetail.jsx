@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
 import { Calendar, FolderOpen, Edit3, MessageSquare } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
     const [newComment, setNewComment] = useState('');
@@ -11,40 +13,7 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
         setNewComment('');
     };
 
-    // Simple parser to render basic markdown-like structure for display
-    const renderContent = (text) => {
-        return text.split('\n').map((line, index) => {
-            // Headers
-            if (line.startsWith('# ')) {
-                return <h1 key={index} className="text-2xl font-bold text-indigo-900 mt-6 mb-3">{line.replace('# ', '')}</h1>;
-            }
-            if (line.startsWith('## ')) {
-                return <h2 key={index} className="text-xl font-bold text-slate-800 mt-5 mb-2 border-b pb-1">{line.replace('## ', '')}</h2>;
-            }
-            // Lists and bullets
-            if (line.startsWith('* ')) {
-                return (
-                    <li
-                        key={index}
-                        className="ml-4 list-disc text-slate-700 mb-1"
-                        dangerouslySetInnerHTML={{ __html: line.replace('* ', '').replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
-                    />
-                );
-            }
-            // Code blocks (very basic)
-            if (line.startsWith('|')) {
-                return <p key={index} className="font-mono text-xs bg-slate-100 p-1 overflow-x-auto whitespace-pre">{line}</p>;
-            }
-            // Paragraphs with bold support
-            return (
-                <p
-                    key={index}
-                    className="text-slate-700 mb-2 leading-relaxed"
-                    dangerouslySetInnerHTML={{ __html: line.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') }}
-                />
-            );
-        });
-    };
+
 
     return (
         <div className="bg-white rounded-lg shadow-lg overflow-hidden animate-fade-in">
@@ -68,8 +37,10 @@ const AtaDetail = ({ ata, onEdit, onBack, onAddComment }) => {
             </div>
 
             <div className="p-8">
-                <div className="prose max-w-none text-slate-800">
-                    {renderContent(ata.content)}
+                <div className="prose prose-indigo max-w-none text-slate-800">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                        {ata.content}
+                    </ReactMarkdown>
                 </div>
             </div>
 
