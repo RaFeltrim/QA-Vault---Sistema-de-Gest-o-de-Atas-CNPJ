@@ -107,39 +107,67 @@ export default function App() {
     };
 
     const fetchCategories = async (projectId) => {
-        const { data, error } = await supabase
-            .from('categories')
-            .select('*')
-            .eq('project_id', projectId)
-            .order('created_at', { ascending: true });
+        try {
+            const { data, error } = await supabase
+                .from('categories')
+                .select('*')
+                .eq('project_id', projectId)
+                .order('created_at', { ascending: true });
 
-        if (error || !data || data.length === 0) {
-            // Fallback or empty
-            if (projectId === 'default') {
+            if (error) {
+                console.warn('Categories fetch error:', error.message);
+                // Use default categories
                 setCategories([
-                    { id: '00-Kickoffs', label: '00 - Kickoffs & Planejamento' },
-                    { id: '01-Kanban', label: '01 - Execução (Kanban)' },
+                    { id: '00-Kickoffs', label: '00 - Kickoffs & Planejamento', name: '00-Kickoffs' },
+                    { id: '01-Kanban', label: '01 - Execução (Kanban)', name: '01-Kanban' },
+                    { id: '02-Milestones', label: '02 - Revisões & Milestones', name: '02-Milestones' },
                 ]);
                 setActiveCategory('00-Kickoffs');
+            } else if (data && data.length > 0) {
+                setCategories(data);
+                setActiveCategory(data[0].id);
             } else {
-                setCategories([]);
-                setActiveCategory(null);
+                // No categories, use defaults
+                setCategories([
+                    { id: '00-Kickoffs', label: '00 - Kickoffs & Planejamento', name: '00-Kickoffs' },
+                    { id: '01-Kanban', label: '01 - Execução (Kanban)', name: '01-Kanban' },
+                ]);
+                setActiveCategory('00-Kickoffs');
             }
-        } else {
-            setCategories(data);
-            if (data.length > 0) setActiveCategory(data[0].id);
+        } catch (e) {
+            console.error('Categories error:', e);
+            setCategories([]);
         }
     };
 
     const fetchAtas = async (projectId) => {
-        const { data, error } = await supabase
-            .from('atas')
-            .select('*')
-            .eq('project_id', projectId)
-            .order('created_at', { ascending: false });
+        try {
+            // Try with project_id filter first
+            let { data, error } = await supabase
+                .from('atas')
+                .select('*')
+                .eq('project_id', projectId)
+                .order('created_at', { ascending: false });
 
-        if (data) {
-            setAtas(data);
+            // If error (likely missing column), fetch all atas
+            if (error) {
+                console.warn('Fetch with project_id failed, fetching all:', error.message);
+                const result = await supabase
+                    .from('atas')
+                    .select('*')
+                    .order('created_at', { ascending: false });
+                data = result.data;
+                error = result.error;
+            }
+
+            if (data) {
+                setAtas(data);
+            } else {
+                setAtas([]);
+            }
+        } catch (e) {
+            console.error('Atas fetch error:', e);
+            setAtas([]);
         }
     };
 
