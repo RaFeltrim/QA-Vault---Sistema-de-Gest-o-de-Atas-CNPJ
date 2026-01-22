@@ -17,7 +17,8 @@ import { supabase } from './supabaseClient';
 pdfjsLib.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.js`;
 
 export default function App() {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
+    // LOGIN DISABLED FOR ANALYSIS - set to true to bypass
+    const [isAuthenticated, setIsAuthenticated] = useState(true);
     const [currentUser, setCurrentUser] = useState('Rafael');
     const [atas, setAtas] = useState([]);
 
