@@ -264,34 +264,41 @@ export default function App() {
             alert('Nenhum projeto selecionado!');
             return;
         }
-        const timestamp = new Date().toISOString();
-        let payload;
 
-        if (selectedAta) {
-            // Edit
-            payload = { ...ataData, id: selectedAta.id };
-        } else {
-            // Create
-            payload = {
-                ...ataData,
-                // id: crypto.randomUUID(), // Let DB handle or generate
-                project_id: activeProject.id, // ISOLATION KEY
-                created_at: timestamp,
-                comments: []
-            };
-        }
+        try {
+            if (selectedAta) {
+                // EDIT: update existing ata
+                const { id, created_at, ...updatePayload } = ataData;
+                const { error } = await supabase
+                    .from('atas')
+                    .update(updatePayload)
+                    .eq('id', selectedAta.id);
 
-        const { error } = await supabase
-            .from('atas')
-            .upsert(payload)
-            .select();
+                if (error) throw error;
+            } else {
+                // CREATE: insert without id (let DB generate)
+                const { id, ...insertPayload } = ataData; // Remove id if present
+                const payload = {
+                    ...insertPayload,
+                    project_id: activeProject.id,
+                    created_at: new Date().toISOString(),
+                    comments: []
+                };
 
-        if (error) {
-            console.error('Error saving ata:', error);
-            alert('Erro ao salvar no Supabase!');
-        } else {
+                const { error } = await supabase
+                    .from('atas')
+                    .insert([payload]);
+
+                if (error) throw error;
+            }
+
             setView('list');
             setSelectedAta(null);
+            // Refetch to get updated data
+            fetchAtas(activeProject.id);
+        } catch (error) {
+            console.error('Error saving ata:', error);
+            alert('Erro ao salvar: ' + error.message);
         }
     };
 
